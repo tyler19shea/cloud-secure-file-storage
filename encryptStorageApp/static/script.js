@@ -1,70 +1,59 @@
-document.getElementById('register-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const username = document.getElementById('register-username').value;
-    const password = document.getElementById('register-password').value;
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle file upload
+    document.getElementById('upload-form').addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevent the default form submission
 
-    const response = await fetch('/auth/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
+        var fileInput = document.getElementById('file');
+        var file = fileInput.files[0];
+        var formData = new FormData();
+        formData.append('file', file);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', this.action, true);
+        xhr.onload = function () {
+            var messageDiv = document.getElementById('message');
+            if (xhr.status === 200) {
+                messageDiv.textContent = 'File uploaded and encrypted successfully!';
+            } else {
+                messageDiv.textContent = 'File upload failed: ' + xhr.responseText;
+            }
+        };
+        xhr.onerror = function () {
+            var messageDiv = document.getElementById('message');
+            messageDiv.textContent = 'Error during file upload';
+        };
+        xhr.send(formData);
     });
-    const result = await response.json();
-    alert(result.message);
-});
 
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const username = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
+    // Handle file download
+    document.getElementById('download-form').addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevent the default form submission
 
-    const response = await fetch('/auth/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
+        var filename = document.getElementById('filename').value;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/download/' + encodeURIComponent(filename), true);
+        xhr.responseType = 'blob';
+        xhr.onload = function () {
+            var messageDiv = document.getElementById('message');
+            if (xhr.status === 200) {
+                var url = window.URL.createObjectURL(xhr.response);
+                var a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                messageDiv.textContent = 'File downloaded successfully!';
+            } else {
+                messageDiv.textContent = 'File download failed: ' + xhr.responseText;
+            }
+        };
+        xhr.onerror = function () {
+            var messageDiv = document.getElementById('message');
+            messageDiv.textContent = 'Error during file download';
+        };
+        xhr.send();
     });
-    const result = await response.json();
-    alert(result.message);
-});
-
-document.getElementById('upload-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const file = document.getElementById('file-upload').files[0];
-    const username = document.getElementById('upload-username').value;
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('username', username);
-
-    const response = await fetch('/upload', {
-        method: 'POST',
-        body: formData
-    });
-    const result = await response.json();
-    alert(result.message);
-});
-
-document.getElementById('download-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const filename = document.getElementById('download-filename').value;
-    const username = document.getElementById('download-username').value;
-
-    const response = await fetch(`/download/${filename}?username=${username}`);
-    if (response.status === 200) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        alert('File downloaded successfully!');
-    } else {
-        const result = await response.json();
-        alert(result.message);
-    }
 });

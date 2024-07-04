@@ -4,36 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure File Storage</title>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
-    <h1>Secure File Storage</h1>
-    <h2>Upload File</h2>
-    <form id="upload-form" enctype="multipart/form-data">
-        <input type="file" id="file-upload" required>
-        <input type="text" id="upload-username" placeholder="Username" required>
-        <button type="submit">Upload</button>
-    </form>
-
-    <h2>Download File</h2>
-    <form id="download-form">
-        <input type="text" id="download-filename" placeholder="Filename" required>
-        <input type="text" id="download-username" placeholder="Username" required>
-        <button type="submit">Download</button>
-    </form>
-    <h2>Register</h2>
-    <form id="register-form">
-        <input type="text" id="register-username" placeholder="Username" required>
-        <input type="password" id="register-password" placeholder="Password" required>
-        <button type="submit">Register</button>
-    </form>
-
-    <h2>Login</h2>
-    <form id="login-form">
-        <input type="text" id="login-username" placeholder="Username" required>
-        <input type="password" id="login-password" placeholder="Password" required>
-        <button type="submit">Login</button>
-    </form>
-
-    <script src="/static/script.js"></script>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+        <h1>Secure File Storage</h1>
+        
+        <!-- Upload Form -->
+        <form id="upload-form" action="{{ url_for('app.upload_file') }}" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" id="file" required>
+            <input type="submit" value="Upload">
+        </form>
+        <br>
+        <!-- Download Form -->
+        <form id="download-form">
+            <input type="text" name="filename" id="filename" placeholder="Filename to download" required>
+            <input type="submit" value="Download">
+        </form>
+    
+        <div id="message"></div>
 </body>
 </html>
