@@ -51,11 +51,13 @@ def download_file(filename):
         if file:
             log_access(user, filename)
             log_error(f'File ready to be sent: {file_path}')
-            return send_file(
+            response = send_file(
                 file, 
                 as_attachment=True, 
                 download_name=filename, 
                 mimetype='application/octet-stream')
+            os.remove(file_path)
+            return response
         else: 
             log_error(f'File not found: {file_path}')
             return jsonify({'message': 'File not found'}), 404
