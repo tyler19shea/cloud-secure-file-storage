@@ -4,13 +4,14 @@ from .models import User
 from flask_login import login_user, logout_user, login_required, current_user
 from encryptStorageApp.utils.logging import log_error
 
-@auth_blueprint.route('/register', methods=['Get', 'POST'])
+@auth_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
         if user:
+            log_error('Registration failed due to Invalid Username.')
             return jsonify({'message': 'Username already exists!'})
         hashed_password = bcrypt.generate_password_hash(password)
         try: 
@@ -19,7 +20,6 @@ def register():
             db.session.commit()
             flash('User registered successfully!')
             return render_template('/login.html', user=current_user)
-            # return redirect(url_for('auth.login'))
         except Exception as e:
             log_error(f'Registration failed: {e}')
             flash('Registration failed. Please try again.')
@@ -52,4 +52,4 @@ def login():
 @login_required
 def logout():
     logout_user()
-    redirect(url_for('auth.login')) 
+    return redirect(url_for('auth.login')) 

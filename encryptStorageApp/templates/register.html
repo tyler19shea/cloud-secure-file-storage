@@ -6,12 +6,19 @@
     <title>Register</title>
 </head>
 <body>
+    <nav>
+        <div>
+            <a class="nav-item" id="login" href="/auth/login">Login</a>
+        </div>
+    </nav>
     <h1>Register</h1>
     <form action="{{ url_for('auth.register') }}" method="post">
         <label for="username">Username:</label>
-        <input type="text" id="username" name="username"><br>
+        <input type="text" id="username" name="username">
+        <br><br>
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password"><br>
+        <input type="password" id="password" name="password">
+        <br><br>
         <input type="submit" value="Register">
     </form>
 </body>
