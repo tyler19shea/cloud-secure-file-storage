@@ -30,9 +30,9 @@ pip install -r requirements.txt
 ```python run.py```
 2. Open your web browser and navigate to http://127.0.0.1:5000/
 3. Login: with your credentials
-4. Register a new user: http://127.0.0:5000/auth/register
+4. From Login page: a new user can be registered
 5. Use the file upload form to select a file and upload. The file will be encrypted and stored securely.
-6. Use the file Download: enter the filename in the download form and submit it to the download the file. The file will be decrypted before downloading
+6. Use the file Download: enter the filename in the download form and submit it to the download the file. The file will be decrypted before downloading and then deleted from the secure folder.
 # Configuration
 Configuration setting are managed in the 'config.py' file. Adjust the settings as needed for the environment
 # Logging
