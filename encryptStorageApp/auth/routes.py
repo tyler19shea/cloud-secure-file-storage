@@ -28,7 +28,7 @@ def register():
             new_user = User(username=username, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
-            flash('User registered successfully!')
+            flash('User registered successfully! Please login.')
             return render_template('/login.html', user=current_user)
         except Exception as e:
             log_error(f'Registration failed: {e}')
@@ -54,11 +54,11 @@ def login():
             flash('Invalid credentials!')
             log_error(f'Login in failed by user: {username}')
             return render_template('login.html')
-            # return redirect(url_for('auth.login'))
     return render_template('login.html', user=current_user)
     
 @auth_blueprint.route('/logout')
 @login_required
 def logout():
     logout_user()
+    flash('You have been logged out.')
     return redirect(url_for('auth.login')) 

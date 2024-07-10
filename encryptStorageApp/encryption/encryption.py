@@ -1,37 +1,29 @@
 from cryptography.fernet import Fernet
+import boto3
 import os
+from encryptStorageApp.utils.logging import log_error
+from config import Config
 
-KEY_FILE = '/Users/tylershea/repos/secure-file-storage/encryption_key.key'
+s3_client = boto3.client('s3')
+fernet = Fernet(Config.ENCRYPTION_KEY)
 
-def generate_key():
-    return Fernet.generate_key()
-
-def save_key(key):
-    with open(KEY_FILE, 'wb') as key_file:
-        key_file.write(key)
-
-def load_key():
-    if os.path.exists(KEY_FILE):
-        with open(KEY_FILE, 'rb') as key_file:
-            return key_file.read()
-    else:
-        key = generate_key()
-        save_key(key)
-        return key
-    
-ENCRYPTION_KEY = load_key()
-fernet = Fernet(ENCRYPTION_KEY)
-
-def encrypt_file(file_path, key):
+def encrypt_file(file_path, filename):
     with open(file_path, 'rb') as file:
         original = file.read()
     encrypted = fernet.encrypt(original)
     with open(file_path, 'wb') as encrypted_file:
         encrypted_file.write(encrypted)
+    
+    s3_client.upload_file(file_path, Config.S3_BUCKET_NAME, filename)
+    log_error(f'File uploaded to S3: {file_path} {filename}')
 
-def decrypt_file(file_path, key):
+def decrypt_file(file_path, filename):
+    s3_client.download_file(Config.S3_BUCKET_NAME, filename, file_path)
+    log_error(f'file downloaded from S3: {file_path} {filename}')
+
     with open(file_path, 'rb') as enc_file:
         encrypted = enc_file.read()
     decrypted = fernet.decrypt(encrypted)
     with open(file_path, 'wb') as dec_file:
         dec_file.write(decrypted)
+    log_error(f'File decrypted: {file_path}')
