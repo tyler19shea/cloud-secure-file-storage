@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, json, send_file, render_template, flash, redirect, url_for, Response
+from flask import Blueprint, request, jsonify, json, send_file, render_template, flash, Response
 from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
 from .encryption import encrypt_file, decrypt_file
@@ -26,7 +26,7 @@ def upload_file():
     
     user = current_user.username
     filename = secure_filename(file.filename)
-    # if current_user.is_authenticated:
+    
     try:
         log_error(f'Received file: {filename} from user: {user}')
         file_path = os.path.join(Config.UPLOAD_FOLDER, filename)
