@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_file, render_template, flash, redirect, url_for
+from flask import Blueprint, request, jsonify, json, send_file, render_template, flash, redirect, url_for, Response
 from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
 from .encryption import encrypt_file, decrypt_file
@@ -52,9 +52,6 @@ def upload_file():
     except Exception as e:
         log_error(f'File upload failed for user: {user}: {traceback.format_exc()}')
         return jsonify({'message': 'File upload failed!', 'error': str(e)}), 500
-    # else:
-    #     flash('You have been logged out due to inactivity')
-    #     return render_template('/login.html')
 
 @app_blueprint.route('/download/<filename>', methods=['GET'])
 @login_required
@@ -63,11 +60,11 @@ def download_file(filename):
     if not filename:
         return flash('Filename not provided'), 400
     file_path = os.path.join(Config.DOWNLOAD_FOLDER, secure_filename(filename))
-    # print(user)
+
     # create the downloads directory if it doesn't exist
     if not os.path.exists(Config.DOWNLOAD_FOLDER):
         os.makedirs(Config.DOWNLOAD_FOLDER)
-    # if current_user.is_authenticated:
+
     try: 
         decrypt_file(file_path, secure_filename(filename))
 
@@ -85,19 +82,14 @@ def download_file(filename):
     except ClientError as e:
         if e.response['Error']['Code'] == '404':
             log_error(f'File not found in S3 bucket: {filename}')
-            flash('File not found', 'error')
+            return Response(json.dumps({'message': 'File not found in S3 bucket'}), status=404, mimetype='application/json')
         else:
             log_error(f'Client error: {str(e)}')
-            flash('File download filed due to client error')
-        return redirect(url_for('app.index'))
+            return Response(json.dumps({'message': 'File download filed due to client error'}), status=500, mimetype='application/json')
     except FileNotFoundError as e:
         log_error(f'File not found: {str(e)}')
         flash('File not found')
-        return redirect(url_for('app.index'))
+        return Response(json.dumps({'message': 'File not found'}), status=404, mimetype='application/json')
     except Exception as e:
         log_error(f'File download failed for user {user}: {traceback.format_exc()}')
-        flash('An Unexpected error occurred', 'error')
-        return redirect(url_for('app.index'))
-    # else:
-    #     flash('You have been logged out due to inactivity')
-    #     return render_template('/login.html')
+        return Response(json.dumps({'message': 'An Unexpected error occurred'}), status=500, mimetype='application/json')

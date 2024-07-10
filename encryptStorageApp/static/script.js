@@ -14,13 +14,16 @@ document.addEventListener('DOMContentLoaded', function() {
             var messageDiv = document.getElementById('message');
             if (xhr.status === 200) {
                 messageDiv.textContent = 'File uploaded and encrypted successfully!';
+                messageDiv.className = 'success';
             } else {
                 messageDiv.textContent = 'File upload failed: ' + xhr.responseText;
+                messageDiv.className = 'error';
             }
         };
         xhr.onerror = function () {
             var messageDiv = document.getElementById('message');
             messageDiv.textContent = 'Error during file upload';
+            messageDiv.className = 'error';
         };
         xhr.send(formData);
     });
@@ -46,14 +49,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 a.click();
                 window.URL.revokeObjectURL(url);
                 messageDiv.textContent = 'File downloaded successfully!';
+                messageDiv.className = 'success';
             } else {
-                messageDiv.textContent = 'File download failed: ' + xhr.responseText;
+                var reader = new FileReader();
+                reader.onload = function() {
+                    var response = JSON.parse(reader.result);
+                    messageDiv.textContent = 'File download failed: ' + response.message;
+                    messageDiv.className = 'error';
+                };
+                reader.readAsText(xhr.response);
             }
         };
         xhr.onerror = function () {
             var messageDiv = document.getElementById('message');
             messageDiv.textContent = 'Error during file download';
+            messageDiv.className = 'error';
         };
         xhr.send();
     });
 });
+
