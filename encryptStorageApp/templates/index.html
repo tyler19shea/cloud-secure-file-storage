@@ -28,6 +28,14 @@
             <div>
                 <a class="nav-item" id="logout" href="auth/logout">Logout</a>
             </div>
+            <div>
+                <a class="nav-item" id="change-pass" href="/change-pass">Change Password</a>
+            </div>
+            {% if current_user.is_admin %}
+            <div>
+                <a class="nav-item" id="Register" href="/auth/register">Register New User</a>
+            </div>
+            {% endif %}
         </nav>
         <h1>Secure File Storage</h1>
         

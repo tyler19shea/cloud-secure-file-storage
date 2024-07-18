@@ -1,8 +1,10 @@
-from flask import Blueprint, request, jsonify, json, send_file, render_template, flash, Response
+from flask import Blueprint, request, jsonify, json, send_file, render_template, flash, Response, redirect, url_for
 from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
 from .encryption import encrypt_file, decrypt_file
 from .utils import log_access, log_error
+from .auth import bcrypt
+from .auth.models import User
 from config import Config
 import traceback
 import os
@@ -14,6 +16,34 @@ app_blueprint = Blueprint('app', __name__)
 @login_required
 def index():
     return render_template('index.html')
+
+@app_blueprint.route('/change-pass', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        username = current_user.username
+        password1 = request.form['password1']
+        password2 = request.form['password2']
+        password3 = request.form['password3']
+
+        # #fetch the user from database
+        user = User.query.filter_by(username=username).first()
+        if not bcrypt.check_password_hash(user.password, password1):
+            flash('Incorrect original password entered')
+            log_error(f'{username} password change attempt fail due to incorrect original password')
+        elif password2 != password3:
+            flash('Passwords do not match')
+        else:
+            try:
+                current_user.password = bcrypt.generate_password_hash(password2)
+                flash('Password has been changed!')
+                log_error(f'{username} password changed')
+                return redirect(url_for('app.index'))
+            except Exception as e:
+                log_error(f'{username} fail to change password due to {e}')
+                flash('Password change failed due to {e}')
+
+    return render_template('changePass.html')
 
 @app_blueprint.route('/upload', methods=['POST'])
 @login_required

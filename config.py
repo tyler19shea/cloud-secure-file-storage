@@ -1,5 +1,6 @@
 import os 
 from cryptography.fernet import Fernet
+from encryptStorageApp.auth.models import User
 
 KEY_FILE = './encryption_key.key'
 

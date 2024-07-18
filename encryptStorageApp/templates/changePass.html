@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change password</title>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <style> 
+        .error {
+            color: red
+        }
+        .success {
+            color:green
+        }
+    </style>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+    <nav>
+        <div>
+            <a class="nav-item" id="logout" href="auth/logout">Logout</a>
+        </div>
+        <div>
+            <a class="nav-item" id="home" href="/">Home</a>
+        </div>
+        {% if current_user.is_admin %}
+        <div>
+            <a class="nav-item" id="Register" href="/auth/register">Register New User</a>
+        </div>
+        {% endif %}
+    </nav>
+    <h1>Password Change of {{ current_user.username }}</h1>
+    <form action="{{ url_for('app.change_password') }}" method="post">
+        <label for="password">Original Password:</label>
+        <input type="password" id="password1" name="password1">
+        <br><br>
+        <label for="password">Changed Password:</label>
+        <input type="password" id="password2" name="password2">
+        <br><br>
+        <label for="password">Re-type Changed Password:</label>
+        <input type="password" id="password3" name="password3">
+        <br><br>
+        <input type="submit" value="Change Password">
+    </form>
+    
+</body>
+</html>

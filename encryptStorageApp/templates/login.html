@@ -16,9 +16,6 @@
     {% endif %}
     {% endwith %}
     <nav>
-        <div>
-            <a class="nav-item" id="Register" href="/auth/register">Register New User</a>
-        </div>
     </nav>
     <h1>Login</h1>
     <form action="{{ url_for('auth.login') }}" method="post">
