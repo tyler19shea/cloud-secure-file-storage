@@ -2,7 +2,7 @@ import os
 from cryptography.fernet import Fernet
 from encryptStorageApp.auth.models import User
 
-KEY_FILE = './encryption_key.key'
+KEY_FILE = os.path.join(os.getcwd(), 'encryption_key.key')
 
 def generate_key():
     return Fernet.generate_key()
