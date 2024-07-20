@@ -30,6 +30,11 @@ def decrypt_file(user, file_path, filename):
 
 def list_files(user):
     response = s3_client.list_objects_v2(Bucket=Config.S3_BUCKET_NAME, Prefix=f'{user}/')
+    length = len(user)
     if 'Contents' in response:
-        return [item['Key'] for item in response['Contents']]
-    return []
+        # return [item['Key'] for item in response['Contents']]
+        contents = []
+        for item in response['Contents']:
+            contents.append(''.join(list(item['Key'])[length+1:]))
+        return contents
+    return ['No files available']
