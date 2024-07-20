@@ -67,5 +67,38 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         xhr.send();
     });
+
+    //Load file list
+    function loadFiles() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/files', true);
+        xhr.onload = function () {
+            var messageDiv = document.getElementById('message');
+            if (xhr.status === 200) {
+                try {
+                    var files = JSON.parse(xhr.responseText);
+                    var fileListDiv = document.getElementById('file-list');
+                    fileListDiv.innerHTML = '';
+                    files.forEach(function(file) {
+                        var fileDiv = document.createElement('div');
+                        fileDiv.textContent = file;
+                        fileListDiv.appendChild(fileDiv);
+                    });
+                } catch (e) {
+                    messageDiv.textContent = 'Failed to parse file list response: ' + xhr.responseText;
+                }
+            } else {
+                messageDiv.textContent = 'Failed to load file list: ' + xhr.responseText;
+            }
+        };
+        xhr.onerror = function () {
+            var messageDiv = document.getElementById('message');
+            messageDiv.textContent = 'Error loading file list';
+        };
+        xhr.send();
+    }
+
+    // Load files on page load
+    loadFiles();
 });
 

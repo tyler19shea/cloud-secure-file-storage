@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, json, send_file, render_template, flash, Response, redirect, url_for
 from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
-from .encryption import encrypt_file, decrypt_file
+from .encryption import encrypt_file, decrypt_file, list_files
 from .utils import log_access, log_error
 from .auth import bcrypt
 from .auth.models import User
@@ -67,11 +67,10 @@ def upload_file():
 
         file.save(file_path)
         log_error(f'Saved file locally: {file_path}')
-        encrypt_file(file_path, filename)
+        encrypt_file(user, file_path, filename)
         log_error(f'Encrypted file and upload to S3: {file_path}')
         log_access(user, filename)
         os.remove(file_path)
-        flash('File uploaded and encrypted successfully!')
         return jsonify({'message': 'File uploaded and encrypted successful!'})
     except (NoCredentialsError, PartialCredentialsError) as e:
         log_error(f'Credentials error: {str(e)}')
@@ -96,7 +95,7 @@ def download_file(filename):
         os.makedirs(Config.DOWNLOAD_FOLDER)
 
     try: 
-        decrypt_file(file_path, secure_filename(filename))
+        decrypt_file(user, file_path, secure_filename(filename))
 
         if not os.path.exists(file_path):
             log_error(f'File not found after decryption: {file_path}')
@@ -123,3 +122,11 @@ def download_file(filename):
     except Exception as e:
         log_error(f'File download failed for user {user}: {traceback.format_exc()}')
         return Response(json.dumps({'message': 'An Unexpected error occurred'}), status=500, mimetype='application/json')
+    
+@app_blueprint.route('/files', methods=['GET'])
+def list_user_files():
+    user = current_user.username 
+    if not user:
+        return redirect(url_for('auth.login'))
+    files = list_files(user)
+    return jsonify(files)
