@@ -20,7 +20,6 @@ def encrypt_file(username, file_path, filename):
 def decrypt_file(user, file_path, filename):
     s3_client.download_file(Config.S3_BUCKET_NAME, f'{user}/{filename}', file_path)
     log_error(f'file downloaded from S3: {file_path} {filename}')
-
     with open(file_path, 'rb') as enc_file:
         encrypted = enc_file.read()
     decrypted = fernet.decrypt(encrypted)
