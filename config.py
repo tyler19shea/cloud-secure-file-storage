@@ -25,6 +25,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///users.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ENCRYPTION_KEY = load_key()
-    S3_BUCKET_NAME = 'tpain-securebucket19'
+    S3_BUCKET_NAME = ''
     UPLOAD_FOLDER = 'uploads'
     DOWNLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'downloads')
